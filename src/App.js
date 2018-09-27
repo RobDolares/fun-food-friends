@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import firebase from './firebase.js';
 import './App.css';
 
@@ -8,9 +8,11 @@ class App extends Component {
     super();
     this.state = {
       currentItem: '',
-      usernamme: ''
+      username: '',
+      items: []
     }
     this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   handleChange(e) {
@@ -19,34 +21,84 @@ class App extends Component {
     });
   }
 
+  handleSubmit(e) {
+    // prevent default behavior of form - if we don't, the window will reload when submit button clicked
+    e.preventDefault();
+
+    // carve space in firebase db where we'd like to store items users are submitting from form.
+    // do this by calling ref() method and pass in dest. where they will be stored ('items')
+    const itemsRef = firebase.database().ref(`items`);
+
+    // grab item(and username) user typed in from state -> pkg into object to be sent to firebase db
+    const item = {
+      title: this.state.currentItem,
+      user: this.state.username
+    }
+
+    // similar to array.push method - sends item object to db
+    itemsRef.push(item);
+
+    // clears inputs so we can add further
+    this.setState({
+      currentItem: '',
+      username: ''
+    })
+  }
+
+  componentDidMount() {
+    const itemsRef = firebase.database().ref(`items`);
+    itemsRef.on('value', (snapshot) => {
+      let items = snapshot.val();
+      let newState = [];
+      for (let item in items) {
+        newState.push({id: item, title: items[item].title, user: items[item].user});
+      }
+      this.setState({items: newState});
+    });
+  }
+
+  removeItem(itemId){
+    const itemRef = firebase.database().ref(`/items/${itemId}`);
+    itemRef.remove();
+  }
 
   render() {
-    return (
-      <div className="App">
-        <header>
-          <div className="wrapper">
-            <h1>Fun Food Friends</h1>
-
-          </div>
-        </header>
-        <div className="container">
-          <section className="add-item">
-            <form action="">
-              <input type="text" name="username" placeholder="What's your name?" onChange={this.handleChange} value={this.state.username}/>
-              <input type="text" name="currentItem" placeholder="What are you bringing?" onChange={this.handleChange} value={this.state.currentItem}/>
-              <button>Add Item</button>
-            </form>
-          </section>
-          <section className="display-item">
-            <div className="wrapper">
-              <ul>
-
-              </ul>
-            </div>
-          </section>
+    return (<div className="App">
+      <header>
+        <div className="wrapper">
+          <h1>Potluck signup application</h1>
+          <i class="fa fa-shopping-basket" aria-hidden="true"></i>
         </div>
+      </header>
+      <div className="container">
+
+        <section className="add-item">
+          <h1>Complete this form:</h1>
+          <form onSubmit={this.handleSubmit}>
+            <input type="text" name="username" placeholder="What's your name?" onChange={this.handleChange} value={this.state.username}/>
+            <input type="text" name="currentItem" placeholder="What are you bringing?" onChange={this.handleChange} value={this.state.currentItem}/>
+            <button>Add Item</button>
+          </form>
+        </section>
+
+        <section className="display-item">
+          <div className="wrapper">
+            <ul>
+              {this.state.items.map((item)=>{
+                return(
+                  <li key={item.id}>
+                    <h3>{item.title}</h3>
+                    <p>brought by: {item.user}</p>
+                    <button onClick={()=>this.removeItem(item.id)}>Remove Item</button>
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+        </section>
+
       </div>
-    );
+    </div>);
   }
 }
 
