@@ -9,6 +9,15 @@ header {
   padding: 33px 0 25px 15px;
 }
 
+header p {
+  width: 400px;
+  margin: 0 auto;
+}
+header .wrapper {
+  display: flex;
+  justify-content: space-between;
+}
+
 header h1 {
   font-size: 25px;
   font-weight: 600;
@@ -46,16 +55,11 @@ header i {
   border-top: 3px solid #103D5D;
   margin-right: 50px;
   background-color: rgb(237, 237, 237);
-  padding: 20px 18px 60px 18px;
+  padding: 60px 18px;
   box-shadow: 0 3px 4px 0 rgba(0,0,0,.14), 0 3px 3px -2px rgba(0,0,0,.12), 0 1px 8px 0 rgba(0,0,0,.2);
   margin-bottom: 34px;
   width: 25%;
   margin-right: auto;
-}
-
-.add-item h1 {
-  text-align: center;
-  color: #103D5D;
 }
 
 .display-item {
@@ -136,4 +140,17 @@ button {
   font-size: 14px;
   box-shadow: 0 2px 5px 0 rgba(0,0,0,.26);
   padding: 10px 6px;
+}
+
+.user-profile {
+  position: fixed;
+  bottom: 20px;
+  right: 40px;
+  width: 100px;
+  height: 100px;
+}
+
+.user-profile img {
+  border-radius: 50%;
+  max-width: 100%;
 }
